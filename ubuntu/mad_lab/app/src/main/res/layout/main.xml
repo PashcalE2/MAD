@@ -29,7 +29,7 @@
                 android:visibility="visible" />
 
             <Button
-                android:id="@+id/test"
+                android:id="@+id/add_button"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="Button"
@@ -40,8 +40,8 @@
         <View
             android:id="@+id/divider"
             android:layout_width="match_parent"
-            android:layout_height="1dp"
-            android:background="?android:attr/listDivider" />
+            android:layout_height="2dp"
+            android:background="@color/black" />
 
         <FrameLayout
             android:id="@+id/body"
@@ -49,32 +49,29 @@
             android:layout_height="match_parent">
 
             <ScrollView
-                android:id="@+id/devices"
+                android:id="@+id/devices_scroll"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent">
 
                 <LinearLayout
+                    android:id="@+id/devices_layout"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:dividerPadding="10dp"
                     android:orientation="vertical"
-                    android:padding="10dp">
+                    android:padding="10dp"
+                    android:contentDescription="@string/devices">
 
-                    <TextView
-                        android:id="@+id/textView"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="Подключенные устройства" />
-
+                    <!--
                     <FrameLayout
                         android:layout_width="match_parent"
                         android:layout_height="match_parent"
                         android:padding="10dp">
 
                         <ImageView
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            tools:src="@tools:sample/avatars" />
+                            android:layout_width="100dp"
+                            android:layout_height="100dp"
+                            android:src="@drawable/conditioner" />
                     </FrameLayout>
 
                     <View
@@ -90,9 +87,9 @@
                         android:padding="10dp">
 
                         <ImageView
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            tools:src="@tools:sample/avatars" />
+                            android:layout_width="100dp"
+                            android:layout_height="100dp"
+                            android:src="@drawable/umnaya_kolonka" />
                     </FrameLayout>
 
                     <View
@@ -108,9 +105,9 @@
                         android:padding="10dp">
 
                         <ImageView
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            tools:src="@tools:sample/avatars" />
+                            android:layout_width="100dp"
+                            android:layout_height="100dp"
+                            android:src="@drawable/mini_light" />
                     </FrameLayout>
 
                     <View
@@ -126,9 +123,9 @@
                         android:padding="10dp">
 
                         <ImageView
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            tools:src="@tools:sample/avatars" />
+                            android:layout_width="100dp"
+                            android:layout_height="100dp"
+                            android:src="@drawable/lamp" />
                     </FrameLayout>
 
                     <View
@@ -144,9 +141,9 @@
                         android:padding="10dp">
 
                         <ImageView
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            tools:src="@tools:sample/avatars" />
+                            android:layout_width="100dp"
+                            android:layout_height="100dp"
+                            android:src="@drawable/vacuum_cleaner" />
                     </FrameLayout>
 
                     <View
@@ -156,6 +153,7 @@
                         android:layout_marginBottom="5dp"
                         android:background="?android:attr/listDivider" />
 
+                    -->
                 </LinearLayout>
             </ScrollView>
         </FrameLayout>
