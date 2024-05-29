@@ -1,19 +1,18 @@
 package main.madlab
 
+import android.content.Intent
 import android.os.Bundle
-import android.view.LayoutInflater
 import android.view.View
-import android.view.ViewGroup
 import android.widget.Button
-import android.widget.FrameLayout
 import android.widget.LinearLayout
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 
+
 class MainActivity : AppCompatActivity() {
-    private lateinit var button: Button
+    private lateinit var addDeviceButton: Button
     private lateinit var devicesLayout: LinearLayout
     private var devicesList = mutableListOf<View>()
 
@@ -29,8 +28,18 @@ class MainActivity : AppCompatActivity() {
 
         devicesLayout = findViewById(R.id.devices_layout)
 
-        button = findViewById(R.id.addDevice)
-        button.setOnClickListener { _ ->
+        addDeviceButton = findViewById(R.id.add_device_button)
+        addDeviceButton.setOnClickListener { _ ->
+            val addDeviceActivity = Intent(this, AddDeviceActivity::class.java)
+            addDeviceActivity.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP)
+            startActivity(addDeviceActivity)
+        }
+    }
+}
+
+
+/*
+
             val newDeviceLayout: ViewGroup = FrameLayout(devicesLayout.context)
             val newDevice: View = LayoutInflater.from(newDeviceLayout.context).inflate(R.layout.device_layout, newDeviceLayout, true)
 
@@ -38,6 +47,5 @@ class MainActivity : AppCompatActivity() {
             devicesLayout.addView(newDeviceLayout)
 
             println(devicesLayout.childCount)
-        }
-    }
-}
+
+ */
