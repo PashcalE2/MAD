@@ -4,9 +4,11 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material3.FloatingActionButton
@@ -16,6 +18,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.tooling.preview.Preview
 import main.madlab.ui.theme.MADLabTheme
 
@@ -32,6 +35,19 @@ class MainActivity : ComponentActivity() {
 }
 
 @Composable
+fun DeviceListItem() {
+    Column {
+        Row {
+
+        }
+
+        Text(text = "Жаробор")
+
+        Text(text = "Кухня | 27*C")
+    }
+}
+
+@Composable
 fun Main() {
     Scaffold (
         floatingActionButton = {
@@ -44,29 +60,35 @@ fun Main() {
             }
         }
     ) { innerPadding ->
-        Column (
+        Column(
             modifier = Modifier.padding(innerPadding),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            Text("Кухня")
-            
+            Row(
+                modifier = Modifier.background(color = Color.Magenta)
+            )
+            {
+                Text(text = "Весь дом")
+
+                Text(text = "Гостинная")
+
+                Text(text = "Коридор")
+            }
+
+            LazyColumn(
+                modifier = Modifier
+                    .background(Color.White)
+                    .weight(1f, false)
+            ) {
+
+            }
         }
     }
 
 }
 
-@Composable
-fun Greeting(name: String, modifier: Modifier = Modifier) {
-    Text(
-        text = "Hello $name!",
-        modifier = modifier
-    )
-}
-
 @Preview(showBackground = true)
 @Composable
-fun GreetingPreview() {
-    MADLabTheme {
-        Greeting("Android")
-    }
+fun MainPreview() {
+    Main()
 }
