@@ -21,8 +21,7 @@
             android:orientation="horizontal">
 
             <ImageView
-                android:layout_width="300dp"
-                android:layout_height="200dp"
+                style="@style/DeviceImg"
                 android:src="@drawable/conditioner" />
 
             <androidx.constraintlayout.widget.ConstraintLayout
@@ -44,13 +43,13 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="Жаробор"
-            android:textAppearance="@style/Device.Header" />
+            android:textAppearance="@style/DeviceText.Header" />
 
         <TextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="Кухня | 27*C"
-            android:textAppearance="@style/Device.Description"
+            android:textAppearance="@style/DeviceText.Description"
             android:textSize="24sp" />
 
         <View
