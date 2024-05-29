@@ -29,9 +29,8 @@
                 android:layout_height="match_parent">
 
                 <ImageButton
-                    android:layout_width="60dp"
-                    android:layout_height="60dp"
-                    android:contentDescription="control device"
+                    style="@style/DeviceButton"
+                    android:contentDescription="@string/Device.Button.Description"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintTop_toTopOf="parent"
                     app:srcCompat="@android:drawable/ic_lock_power_off" />
@@ -49,8 +48,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="Кухня | 27*C"
-            android:textAppearance="@style/DeviceText.Description"
-            android:textSize="24sp" />
+            android:textAppearance="@style/DeviceText.Description" />
 
         <View
             android:id="@+id/view"

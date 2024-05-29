@@ -66,7 +66,6 @@ class AppDB(private val context: Context, private val factory: SQLiteDatabase.Cu
         try {
             cursor = db.rawQuery(selectQuery, null)
         } catch (e: Exception) {
-            db.execSQL(selectQuery)
             return emptyList()
         }
 
