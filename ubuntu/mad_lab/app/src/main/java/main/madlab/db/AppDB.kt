@@ -1,11 +1,11 @@
 package main.madlab.db
 
-import android.annotation.SuppressLint
 import android.content.ContentValues
 import android.content.Context
 import android.database.Cursor
 import android.database.sqlite.SQLiteDatabase
 import android.database.sqlite.SQLiteOpenHelper
+import main.madlab.db.data.DeviceInfo
 import main.madlab.db.data.Room
 
 
@@ -18,24 +18,46 @@ class AppDB(private val context: Context, private val factory: SQLiteDatabase.Cu
             const val tableName = "room"
 
             const val id = "id"
+            const val idFull = tableName + "." + id
+
             const val name = "name"
+            const val nameFull = tableName + "." + name
         }
 
         private object DeviceMeta {
             const val tableName = "device"
 
             const val id = "id"
+            const val idFull = tableName + "." + id
+
             const val roomId = "roomId"
+            const val roomIdFull = tableName + "." + roomId
+
             const val typeId = "typeId"
+            const val typeIdFull = tableName + "." + typeId
+
             const val name = "name"
+            const val nameFull = tableName + "." + name
         }
 
         private object DeviceTypeMeta {
             const val tableName = "devicetype"
 
             const val id = "id"
+            const val idFull = tableName + "." + id
+
             const val name = "name"
+            const val nameFull = tableName + "." + name
+
             const val imgId = "imgId"
+            const val imgIdFull = tableName + "." + imgId
+        }
+
+        private object DeviceInfoMeta {
+            const val deviceId = "deviceId"
+            const val imgId = "imgId"
+            const val deviceName = "deviceName"
+            const val roomName = "roomName"
         }
     }
 
@@ -75,15 +97,13 @@ class AppDB(private val context: Context, private val factory: SQLiteDatabase.Cu
         db.close()
     }
 
-    @SuppressLint("Range")
     fun getAllRooms(): List<Room> {
         val roomList = mutableListOf<Room>()
-        val selectQuery = "select * from ${RoomMeta.tableName}"
         val db = this.readableDatabase
         val cursor: Cursor?
 
         try {
-            cursor = db.rawQuery(selectQuery, null)
+            cursor = db.rawQuery("select * from ${RoomMeta.tableName}", null)
         } catch (e: Exception) {
             return emptyList()
         }
@@ -91,8 +111,9 @@ class AppDB(private val context: Context, private val factory: SQLiteDatabase.Cu
         cursor?.use {
             if (it.moveToFirst()) {
                 do {
-                    val id = it.getInt(it.getColumnIndex(RoomMeta.id))
-                    val name = it.getString(it.getColumnIndex(RoomMeta.name))
+                    val id = it.getInt(it.getColumnIndexOrThrow(RoomMeta.id))
+                    val name = it.getString(it.getColumnIndexOrThrow(RoomMeta.name))
+
                     val room = Room(id, name)
                     roomList.add(room)
                 } while (it.moveToNext())
@@ -108,6 +129,44 @@ class AppDB(private val context: Context, private val factory: SQLiteDatabase.Cu
         val result = db.delete(RoomMeta.tableName, "${RoomMeta.id} = ?", arrayOf(roomId.toString()))
         db.close()
         return result
+    }
+
+    fun getAllDevicesInfo(): List<DeviceInfo> {
+        val devicesInfo = mutableListOf<DeviceInfo>()
+
+        val db = this.readableDatabase
+        val cursor: Cursor?
+
+        try {
+            cursor = db.rawQuery("select " +
+                    "${DeviceMeta.idFull} as ${DeviceInfoMeta.deviceId}, " +
+                    "${DeviceTypeMeta.imgIdFull} as ${DeviceInfoMeta.imgId}, " +
+                    "${DeviceMeta.nameFull} as ${DeviceInfoMeta.deviceName}, " +
+                    "${RoomMeta.nameFull} as ${DeviceInfoMeta.roomName} " +
+                    "from ${DeviceMeta.tableName}" +
+                    "inner join ${DeviceTypeMeta.tableName} on ${DeviceMeta.idFull} = ${DeviceTypeMeta.idFull} " +
+                    "inner join room on ${DeviceMeta.roomIdFull} = ${RoomMeta.idFull}", null
+            )
+        } catch (e: Exception) {
+            return emptyList()
+        }
+
+        cursor?.use {
+            if (it.moveToFirst()) {
+                do {
+                    val id = it.getInt(it.getColumnIndexOrThrow(DeviceInfoMeta.deviceId))
+                    val imgId = it.getInt(it.getColumnIndexOrThrow(DeviceInfoMeta.imgId))
+                    val deviceName = it.getString(it.getColumnIndexOrThrow(DeviceInfoMeta.deviceName))
+                    val roomName = it.getString(it.getColumnIndexOrThrow(DeviceInfoMeta.roomName))
+
+                    val deviceInfo = DeviceInfo(id, imgId, deviceName, roomName)
+                    devicesInfo.add(deviceInfo)
+                } while (it.moveToNext())
+            }
+        }
+
+        db.close()
+        return devicesInfo
     }
 
 }
