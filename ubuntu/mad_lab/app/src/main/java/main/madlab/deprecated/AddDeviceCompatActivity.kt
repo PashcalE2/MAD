@@ -1,4 +1,4 @@
-package main.madlab
+package main.madlab.deprecated
 
 import android.os.Bundle
 import android.widget.Button
@@ -6,8 +6,9 @@ import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
+import main.madlab.R
 
-class AddDeviceActivity : AppCompatActivity() {
+class AddDeviceCompatActivity : AppCompatActivity() {
     private lateinit var addDeviceButton: Button
 
     override fun onCreate(savedInstanceState: Bundle?) {

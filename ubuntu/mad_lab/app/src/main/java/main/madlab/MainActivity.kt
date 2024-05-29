@@ -1,51 +1,72 @@
 package main.madlab
 
-import android.content.Intent
 import android.os.Bundle
-import android.view.View
-import android.widget.Button
-import android.widget.LinearLayout
+import androidx.activity.ComponentActivity
+import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
-import androidx.appcompat.app.AppCompatActivity
-import androidx.core.view.ViewCompat
-import androidx.core.view.WindowInsetsCompat
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.padding
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Add
+import androidx.compose.material3.FloatingActionButton
+import androidx.compose.material3.Icon
+import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Text
+import androidx.compose.runtime.Composable
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.tooling.preview.Preview
+import main.madlab.ui.theme.MADLabTheme
 
-
-class MainActivity : AppCompatActivity() {
-    private lateinit var addDeviceButton: Button
-    private lateinit var devicesLayout: LinearLayout
-    private var devicesList = mutableListOf<View>()
-
+class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
-        setContentView(R.layout.main_page)
-        ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main)) { v, insets ->
-            val systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
-            v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom)
-            insets
-        }
-
-        devicesLayout = findViewById(R.id.devices_layout)
-
-        addDeviceButton = findViewById(R.id.add_device_button)
-        addDeviceButton.setOnClickListener { _ ->
-            val addDeviceActivity = Intent(this, AddDeviceActivity::class.java)
-            addDeviceActivity.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP)
-            startActivity(addDeviceActivity)
+        setContent {
+            MADLabTheme {
+                Main()
+            }
         }
     }
 }
 
+@Composable
+fun Main() {
+    Scaffold (
+        floatingActionButton = {
+            FloatingActionButton(
+                onClick = {
+                    println(123)
+                }
+            ) {
+                Icon(Icons.Default.Add, contentDescription = "Добавить устройство")
+            }
+        }
+    ) { innerPadding ->
+        Column (
+            modifier = Modifier.padding(innerPadding),
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
+            Text("Кухня")
+            
+        }
+    }
 
-/*
+}
 
-            val newDeviceLayout: ViewGroup = FrameLayout(devicesLayout.context)
-            val newDevice: View = LayoutInflater.from(newDeviceLayout.context).inflate(R.layout.device_layout, newDeviceLayout, true)
+@Composable
+fun Greeting(name: String, modifier: Modifier = Modifier) {
+    Text(
+        text = "Hello $name!",
+        modifier = modifier
+    )
+}
 
-            devicesList.add(newDeviceLayout)
-            devicesLayout.addView(newDeviceLayout)
-
-            println(devicesLayout.childCount)
-
- */
+@Preview(showBackground = true)
+@Composable
+fun GreetingPreview() {
+    MADLabTheme {
+        Greeting("Android")
+    }
+}
