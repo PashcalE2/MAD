@@ -6,6 +6,7 @@ import android.content.Context
 import android.database.Cursor
 import android.database.sqlite.SQLiteDatabase
 import android.database.sqlite.SQLiteOpenHelper
+import main.madlab.db.data.Room
 
 
 class AppDB(private val context: Context, private val factory: SQLiteDatabase.CursorFactory?) : SQLiteOpenHelper(context, DB_NAME, factory, DB_VERSION) {
@@ -13,27 +14,44 @@ class AppDB(private val context: Context, private val factory: SQLiteDatabase.Cu
         private const val DB_NAME = "MAD db"
         private const val DB_VERSION = 1
 
-        private const val ROOM_TABLE_NAME = "room"
-        private const val ROOM_PK = "id"
-        private const val ROOM_NAME_ATR = "name"
+        private object RoomMeta {
+            const val tableName = "room"
 
-        private const val DEVICE_TABLE_NAME = "device"
-        private const val DEVICE_PK = "id"
-        private const val DEVICE_ROOM_FK = "room_id"
-        private const val DEVICE_NAME_ATR = "name"
+            const val id = "id"
+            const val name = "name"
+        }
+
+        private object DeviceMeta {
+            const val tableName = "device"
+
+            const val id = "id"
+            const val roomId = "roomId"
+            const val typeId = "typeId"
+            const val name = "name"
+        }
+
+        private object DeviceTypeMeta {
+            const val tableName = "devicetype"
+
+            const val id = "id"
+            const val name = "name"
+            const val imgId = "imgId"
+        }
     }
 
     override fun onCreate(db: SQLiteDatabase?) {
-        val createRoomTableQuery = "create table $ROOM_TABLE_NAME (" +
-                "$ROOM_PK int primary key, " +
-                "$ROOM_NAME_ATR text not null" +
+        val createRoomTableQuery = "create table ${RoomMeta.tableName} (" +
+                "${RoomMeta.id} int primary key, " +
+                "${RoomMeta.name} text not null" +
                 ");"
 
-        val createDeviceTableQuery = "create table $DEVICE_TABLE_NAME (" +
-                "$DEVICE_PK int primary key, " +
-                "$DEVICE_ROOM_FK int not null," +
-                "$DEVICE_NAME_ATR text not null," +
-                "foreign key ($DEVICE_ROOM_FK) references $ROOM_TABLE_NAME($ROOM_PK)" +
+        val createDeviceTableQuery = "create table ${DeviceMeta.tableName} (" +
+                "${DeviceMeta.id} int primary key, " +
+                "${DeviceMeta.roomId} int not null," +
+                "${DeviceMeta.typeId} int not null," +
+                "${DeviceMeta.name} text not null," +
+                "foreign key (${DeviceMeta.roomId}) references ${RoomMeta.tableName}(id)," +
+                "foreign key (${DeviceMeta.typeId}) references ${DeviceMeta.tableName}(id)" +
                 ");"
 
 
@@ -42,24 +60,25 @@ class AppDB(private val context: Context, private val factory: SQLiteDatabase.Cu
     }
 
     override fun onUpgrade(db: SQLiteDatabase?, oldVersion: Int, newVersion: Int) {
-        db?.execSQL("drop table if exists $DEVICE_TABLE_NAME;")
-        db?.execSQL("drop table if exists $ROOM_TABLE_NAME;")
+        db?.execSQL("drop table if exists ${DeviceMeta.tableName};")
+        db?.execSQL("drop table if exists ${DeviceTypeMeta.tableName};")
+        db?.execSQL("drop table if exists ${RoomMeta.tableName};")
         onCreate(db)
     }
 
     fun addRoom(room: Room) {
         val db = writableDatabase
         val values = ContentValues().apply {
-            put(ROOM_PK, room.name)
+            put("id", room.name)
         }
-        db.insert(ROOM_TABLE_NAME, null, values)
+        db.insert("room", null, values)
         db.close()
     }
 
     @SuppressLint("Range")
     fun getAllRooms(): List<Room> {
         val roomList = mutableListOf<Room>()
-        val selectQuery = "select * from $ROOM_TABLE_NAME"
+        val selectQuery = "select * from ${RoomMeta.tableName}"
         val db = this.readableDatabase
         val cursor: Cursor?
 
@@ -72,8 +91,8 @@ class AppDB(private val context: Context, private val factory: SQLiteDatabase.Cu
         cursor?.use {
             if (it.moveToFirst()) {
                 do {
-                    val id = it.getInt(it.getColumnIndex(ROOM_PK))
-                    val name = it.getString(it.getColumnIndex(ROOM_NAME_ATR))
+                    val id = it.getInt(it.getColumnIndex(RoomMeta.id))
+                    val name = it.getString(it.getColumnIndex(RoomMeta.name))
                     val room = Room(id, name)
                     roomList.add(room)
                 } while (it.moveToNext())
@@ -86,7 +105,7 @@ class AppDB(private val context: Context, private val factory: SQLiteDatabase.Cu
 
     fun deleteRoom(roomId: Int): Int {
         val db = writableDatabase
-        val result = db.delete(ROOM_TABLE_NAME, "$ROOM_PK = ?", arrayOf(roomId.toString()))
+        val result = db.delete(RoomMeta.tableName, "${RoomMeta.id} = ?", arrayOf(roomId.toString()))
         db.close()
         return result
     }
