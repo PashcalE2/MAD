@@ -5,11 +5,16 @@ import android.content.Context
 import android.database.Cursor
 import android.database.sqlite.SQLiteDatabase
 import android.database.sqlite.SQLiteOpenHelper
+import main.madlab.db.data.Device
 import main.madlab.db.data.DeviceInfo
+import main.madlab.db.data.DeviceType
 import main.madlab.db.data.Room
+import main.madlab.db.data.getDefinedDeviceTypes
+import main.madlab.db.data.getDefinedDevices
+import main.madlab.db.data.getDefinedRooms
 
 
-class AppDB(private val context: Context, private val factory: SQLiteDatabase.CursorFactory?) : SQLiteOpenHelper(context, DB_NAME, factory, DB_VERSION) {
+class AppDB(private val context: Context) : SQLiteOpenHelper(context, DB_NAME, null, DB_VERSION) {
     companion object {
         private const val DB_NAME = "MAD db"
         private const val DB_VERSION = 1
@@ -57,49 +62,84 @@ class AppDB(private val context: Context, private val factory: SQLiteDatabase.Cu
             const val deviceId = "deviceId"
             const val imgId = "imgId"
             const val deviceName = "deviceName"
+            const val roomId = "roomId"
             const val roomName = "roomName"
         }
     }
 
     override fun onCreate(db: SQLiteDatabase?) {
         val createRoomTableQuery = "create table ${RoomMeta.tableName} (" +
-                "${RoomMeta.id} int primary key, " +
-                "${RoomMeta.name} text not null" +
+                "${RoomMeta.id} integer primary key autoincrement, " +
+                "${RoomMeta.name} text not null " +
+                ");"
+
+        val createDeviceTypeTableQuery = "create table ${DeviceTypeMeta.tableName} (" +
+                "${DeviceTypeMeta.id} integer primary key autoincrement, " +
+                "${DeviceTypeMeta.name} text not null, " +
+                "${DeviceTypeMeta.imgId} integer not null " +
                 ");"
 
         val createDeviceTableQuery = "create table ${DeviceMeta.tableName} (" +
-                "${DeviceMeta.id} int primary key, " +
-                "${DeviceMeta.roomId} int not null," +
-                "${DeviceMeta.typeId} int not null," +
-                "${DeviceMeta.name} text not null," +
-                "foreign key (${DeviceMeta.roomId}) references ${RoomMeta.tableName}(id)," +
-                "foreign key (${DeviceMeta.typeId}) references ${DeviceMeta.tableName}(id)" +
+                "${DeviceMeta.id} integer primary key autoincrement, " +
+                "${DeviceMeta.roomId} integer, " +
+                "${DeviceMeta.typeId} integer not null, " +
+                "'${DeviceMeta.name}' text not null, " +
+                "foreign key (${DeviceMeta.roomId}) references ${RoomMeta.tableName}(id), " +
+                "foreign key (${DeviceMeta.typeId}) references ${DeviceTypeMeta.tableName}(id) " +
                 ");"
 
-
         db?.execSQL(createRoomTableQuery)
+        db?.execSQL(createDeviceTypeTableQuery)
         db?.execSQL(createDeviceTableQuery)
+
+        getDefinedRooms().forEach {room ->
+            db?.execSQL("insert into ${RoomMeta.tableName} values (${room.id}, '${room.name}')")
+        }
+
+        getDefinedDeviceTypes().forEach { deviceType ->
+            db?.execSQL("insert into ${DeviceTypeMeta.tableName} values (${deviceType.id}, '${deviceType.name}', ${deviceType.imgId})")
+        }
+
+        getDefinedDevices().forEach { device ->
+            db?.execSQL("insert into ${DeviceMeta.tableName} values (${device.id}, ${device.roomId}, ${device.typeId}, '${device.name}')")
+        }
+
+        println("DB: CREATED")
     }
 
     override fun onUpgrade(db: SQLiteDatabase?, oldVersion: Int, newVersion: Int) {
         db?.execSQL("drop table if exists ${DeviceMeta.tableName};")
         db?.execSQL("drop table if exists ${DeviceTypeMeta.tableName};")
         db?.execSQL("drop table if exists ${RoomMeta.tableName};")
+
         onCreate(db)
+    }
+
+    override fun onDowngrade(db: SQLiteDatabase?, oldVersion: Int, newVersion: Int) {
+        db?.execSQL("drop table if exists ${DeviceMeta.tableName};")
+        db?.execSQL("drop table if exists ${DeviceTypeMeta.tableName};")
+        db?.execSQL("drop table if exists ${RoomMeta.tableName};")
+
+        onCreate(db)
+    }
+
+    override fun onOpen(db: SQLiteDatabase?) {
+        super.onOpen(db)
     }
 
     fun addRoom(room: Room) {
         val db = writableDatabase
-        val values = ContentValues().apply {
-            put("id", room.name)
-        }
-        db.insert("room", null, values)
+        val values = ContentValues()
+
+        values.put(RoomMeta.name, room.name)
+
+        db.insertOrThrow(RoomMeta.tableName, null, values)
         db.close()
     }
 
     fun getAllRooms(): List<Room> {
         val roomList = mutableListOf<Room>()
-        val db = this.readableDatabase
+        val db = readableDatabase
         val cursor: Cursor?
 
         try {
@@ -115,6 +155,8 @@ class AppDB(private val context: Context, private val factory: SQLiteDatabase.Cu
                     val name = it.getString(it.getColumnIndexOrThrow(RoomMeta.name))
 
                     val room = Room(id, name)
+                    println("SELECT * FROM ROOM: found: $id, $name")
+
                     roomList.add(room)
                 } while (it.moveToNext())
             }
@@ -131,21 +173,58 @@ class AppDB(private val context: Context, private val factory: SQLiteDatabase.Cu
         return result
     }
 
-    fun getAllDevicesInfo(): List<DeviceInfo> {
-        val devicesInfo = mutableListOf<DeviceInfo>()
-
-        val db = this.readableDatabase
+    fun getAllDeviceTypes(): List<DeviceType> {
+        val typeList = mutableListOf<DeviceType>()
+        val db = readableDatabase
         val cursor: Cursor?
 
         try {
-            cursor = db.rawQuery("select " +
-                    "${DeviceMeta.idFull} as ${DeviceInfoMeta.deviceId}, " +
-                    "${DeviceTypeMeta.imgIdFull} as ${DeviceInfoMeta.imgId}, " +
-                    "${DeviceMeta.nameFull} as ${DeviceInfoMeta.deviceName}, " +
-                    "${RoomMeta.nameFull} as ${DeviceInfoMeta.roomName} " +
-                    "from ${DeviceMeta.tableName}" +
-                    "inner join ${DeviceTypeMeta.tableName} on ${DeviceMeta.idFull} = ${DeviceTypeMeta.idFull} " +
-                    "inner join room on ${DeviceMeta.roomIdFull} = ${RoomMeta.idFull}", null
+            cursor = db.rawQuery("select * from ${DeviceTypeMeta.tableName}", null)
+        } catch (e: Exception) {
+            return emptyList()
+        }
+
+        cursor?.use {
+            if (it.moveToFirst()) {
+                do {
+                    val id = it.getInt(it.getColumnIndexOrThrow(DeviceTypeMeta.id))
+                    val name = it.getString(it.getColumnIndexOrThrow(DeviceTypeMeta.name))
+                    val imgId = it.getInt(it.getColumnIndexOrThrow(DeviceTypeMeta.imgId))
+
+                    val type = DeviceType(id, name, imgId)
+                    typeList.add(type)
+                } while (it.moveToNext())
+            }
+        }
+
+        db.close()
+        return typeList
+    }
+
+    fun getAllDevicesInfo(roomId: Int?): List<DeviceInfo> {
+        val devicesInfo = mutableListOf<DeviceInfo>()
+
+        val db = readableDatabase
+        val cursor: Cursor?
+
+        val whereClause = when (roomId) {
+            null -> ""
+            else -> "where ${RoomMeta.idFull} = $roomId"
+        }
+
+        try {
+            cursor = db.rawQuery(
+                "select " +
+                        "${DeviceMeta.idFull} as ${DeviceInfoMeta.deviceId}, " +
+                        "${DeviceTypeMeta.imgIdFull} as ${DeviceInfoMeta.imgId}, " +
+                        "${DeviceMeta.nameFull} as ${DeviceInfoMeta.deviceName}, " +
+                        "${RoomMeta.idFull} as ${DeviceInfoMeta.roomId}, " +
+                        "${RoomMeta.nameFull} as ${DeviceInfoMeta.roomName} " +
+                        "from ${DeviceMeta.tableName} " +
+                        "inner join ${DeviceTypeMeta.tableName} on ${DeviceMeta.typeIdFull} = ${DeviceTypeMeta.idFull} " +
+                        "left join room on ${DeviceMeta.roomIdFull} = ${RoomMeta.idFull} " +
+                        whereClause,
+                null
             )
         } catch (e: Exception) {
             return emptyList()
@@ -157,9 +236,16 @@ class AppDB(private val context: Context, private val factory: SQLiteDatabase.Cu
                     val id = it.getInt(it.getColumnIndexOrThrow(DeviceInfoMeta.deviceId))
                     val imgId = it.getInt(it.getColumnIndexOrThrow(DeviceInfoMeta.imgId))
                     val deviceName = it.getString(it.getColumnIndexOrThrow(DeviceInfoMeta.deviceName))
+
+                    val roomId: Int? = try {
+                        it.getInt(it.getColumnIndexOrThrow(DeviceInfoMeta.roomId))
+                    } catch (e: Exception) {
+                        null
+                    }
+
                     val roomName = it.getString(it.getColumnIndexOrThrow(DeviceInfoMeta.roomName))
 
-                    val deviceInfo = DeviceInfo(id, imgId, deviceName, roomName)
+                    val deviceInfo = DeviceInfo(id, imgId, deviceName, roomId, roomName)
                     devicesInfo.add(deviceInfo)
                 } while (it.moveToNext())
             }
@@ -167,6 +253,28 @@ class AppDB(private val context: Context, private val factory: SQLiteDatabase.Cu
 
         db.close()
         return devicesInfo
+    }
+
+    fun addDevice(device: Device) {
+        val db = writableDatabase
+        val values = ContentValues()
+
+        values.put(DeviceMeta.roomId, device.roomId)
+        values.put(DeviceMeta.typeId, device.typeId)
+        values.put(DeviceMeta.name, device.name)
+
+        db.insertOrThrow(DeviceMeta.tableName, null, values)
+
+        println("DB: INSERT: ${device.roomId}, ${device.name}, ${device.typeId}")
+
+        db.close()
+    }
+
+    fun removeDevice(deviceId: Int): Int {
+        val db = writableDatabase
+        val result = db.delete(DeviceMeta.tableName, "${DeviceMeta.id} = ?", arrayOf(deviceId.toString()))
+        db.close()
+        return result
     }
 
 }

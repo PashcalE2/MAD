@@ -4,12 +4,12 @@ import androidx.annotation.DrawableRes
 import main.madlab.R
 
 data class DeviceType(
-    val id: Int,
-    val name: String,
-    @DrawableRes val imgId: Int
+    var id: Int,
+    var name: String,
+    @DrawableRes var imgId: Int
 )
 
-private val deviceTypes = listOf(
+private val definedDeviceTypes = listOf(
     DeviceType(0, "Кондиционер", R.drawable.conditioner),
     DeviceType(1, "Лампа", R.drawable.lamp),
     DeviceType(2, "Светодиодная лента", R.drawable.mini_light),
@@ -17,6 +17,6 @@ private val deviceTypes = listOf(
     DeviceType(4, "Робот пылесос", R.drawable.vacuum_cleaner)
 )
 
-fun getDeviceTypes(): List<DeviceType> {
-    return deviceTypes
+fun getDefinedDeviceTypes(): List<DeviceType> {
+    return definedDeviceTypes
 }
