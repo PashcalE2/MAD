@@ -48,12 +48,15 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import main.madlab.AppViewModel
+import main.madlab.db.data.Device
 import main.madlab.db.data.DeviceInfo
 import main.madlab.db.data.Room
 import main.madlab.ui.theme.MADLabTheme
+import main.madlab.updateDeviceRoute
+import main.madlab.updateRoomRoute
 
 @Composable
-fun DeviceListItem(vm: AppViewModel?, deviceInfo: DeviceInfo, callback: () -> Unit) {
+fun DeviceListItem(navController: NavController?, vm: AppViewModel?, deviceInfo: DeviceInfo, onDelete: () -> Unit) {
     var showMenu by remember { mutableStateOf(false) }
 
     println("MAIN: PLACED ${deviceInfo.deviceName}, ${deviceInfo.imgId}")
@@ -95,25 +98,29 @@ fun DeviceListItem(vm: AppViewModel?, deviceInfo: DeviceInfo, callback: () -> Un
                     expanded = showMenu,
                     onDismissRequest = { showMenu = false }
                 ) {
-
-                    /*
                     DropdownMenuItem(
                         text = { Text(text = "Настроить") },
                         onClick = {
                             println("Настроить " + deviceInfo.deviceId)
-                            // vm.openDeviceSettings(deviceInfo.deviceId)
+
+                            navController?.navigate(updateDeviceRoute(Device(
+                                deviceInfo.deviceId,
+                                deviceInfo.roomId,
+                                deviceInfo.deviceTypeId,
+                                deviceInfo.deviceName
+                            )))
 
                             showMenu = false
                         }
                     )
-                    */
+
 
                     DropdownMenuItem(
                         text = { Text(text = "Удалить") },
                         onClick = {
                             println("Удалить " + deviceInfo.deviceId)
-                            vm!!.removeDevice(deviceInfo.deviceId)
-                            callback()
+                            vm!!.deleteDevice(deviceInfo.deviceId)
+                            onDelete()
 
                             showMenu = false
                         }
@@ -162,15 +169,18 @@ fun DeviceListItem(vm: AppViewModel?, deviceInfo: DeviceInfo, callback: () -> Un
 }
 
 @Composable
-fun RoomSelectionButton(room: Room, onClick: (Room) -> Unit, selectedRoomId: Int) {
+fun RoomSelectionButton(room: Room, onClickWhenNotSelected: (Room) -> Unit, onClickWhenSelected: (Room) -> Unit, selectedRoomId: Int) {
     var selected by remember { mutableStateOf(false) }
 
     selected = selectedRoomId == room.id
 
     ElevatedButton(
         onClick = {
-            if (!selected) {
-                onClick(room)
+            if (selected) {
+                onClickWhenSelected(room)
+            }
+            else {
+                onClickWhenNotSelected(room)
             }
         },
 
@@ -199,6 +209,7 @@ fun Main(navController: NavController?, vm: AppViewModel?) {
     var showRoomMenu by remember { mutableStateOf(false) }
     var updateTrigger by remember { mutableStateOf(false) }
     var selectedRoomId by remember { mutableIntStateOf(vm!!.ALL_ROOMS_ID) }
+    var deleteRoomEnabled by remember { mutableStateOf(false) }
 
     val devicesInfo: List<DeviceInfo> = vm!!.getAllDevicesInfo(selectedRoomId)
     println("MAIN: DEVICES COUNT NOW: ${devicesInfo.count()}, ${vm.getAllDevicesInfo(selectedRoomId).count()}")
@@ -229,9 +240,13 @@ fun Main(navController: NavController?, vm: AppViewModel?) {
                             items(1) { _ ->
                                 RoomSelectionButton(
                                     room = Room(vm.ALL_ROOMS_ID, vm.ALL_ROOMS_NAME),
-                                    onClick = {
+                                    onClickWhenNotSelected = {
                                         selectedRoomId = it.id
+                                        deleteRoomEnabled = false
+
                                         updateTrigger = !updateTrigger
+                                    },
+                                    onClickWhenSelected = {
                                     },
                                     selectedRoomId = selectedRoomId
                                 )
@@ -240,9 +255,14 @@ fun Main(navController: NavController?, vm: AppViewModel?) {
                             items(vm.getAllRooms()) { room ->
                                 RoomSelectionButton(
                                     room = room,
-                                    onClick = {
+                                    onClickWhenNotSelected = {
                                         selectedRoomId = it.id
+                                        deleteRoomEnabled = true
+
                                         updateTrigger = !updateTrigger
+                                    },
+                                    onClickWhenSelected = {
+                                        navController?.navigate(updateRoomRoute(room))
                                     },
                                     selectedRoomId = selectedRoomId
                                 )
@@ -277,17 +297,19 @@ fun Main(navController: NavController?, vm: AppViewModel?) {
                                         text = { Text(text = "Добавить комнату") },
                                         enabled = true,
                                         onClick = {
-                                            // vm.createNewRoom()
+                                            navController?.navigate("addRoom")
                                             showRoomMenu = false
                                         }
                                     )
 
                                     DropdownMenuItem(
                                         text = { Text(text = "Удалить комнату") },
-                                        enabled = false,
+                                        enabled = deleteRoomEnabled,
                                         onClick = {
-                                            // vm.removeRoom(vm.selectedRoom.id)
+                                            vm.deleteRoom(selectedRoomId)
                                             showRoomMenu = false
+
+                                            updateTrigger = !updateTrigger
                                         }
                                     )
                                 }
@@ -328,9 +350,10 @@ fun Main(navController: NavController?, vm: AppViewModel?) {
 
                         itemsIndexed(devicesInfo) { _, info ->
                             DeviceListItem(
+                                navController = navController,
                                 vm = vm,
                                 deviceInfo = info,
-                                callback = {
+                                onDelete = {
                                     updateTrigger = !updateTrigger
                                 }
                             )

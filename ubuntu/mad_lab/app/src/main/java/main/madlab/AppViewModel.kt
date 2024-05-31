@@ -18,8 +18,23 @@ class AppViewModel(context: Context): ViewModel() {
         return db.getAllRooms()
     }
 
+    fun addRoom(roomName: String) {
+        db.addRoom(Room(-1, roomName))
+    }
+
+    fun updateRoom(room: Room) {
+        db.updateRoom(room)
+    }
+
+    fun deleteRoom(roomId: Int): Int {
+        val result = db.deleteRoom(roomId)
+        println("Deleted room $result")
+
+        return result
+    }
+
     fun getAllDevicesInfo(roomId: Int): List<DeviceInfo> {
-        if (roomId < 0) {
+        if (roomId == ALL_ROOMS_ID) {
             return db.getAllDevicesInfo(null)
         }
 
@@ -31,7 +46,7 @@ class AppViewModel(context: Context): ViewModel() {
     }
 
     fun addDevice(deviceName: String, roomId: Int, typeId: Int) {
-        if (roomId < 0) {
+        if (roomId == ALL_ROOMS_ID) {
             db.addDevice(Device(-1, null, typeId, deviceName))
         }
         else {
@@ -39,9 +54,13 @@ class AppViewModel(context: Context): ViewModel() {
         }
     }
 
-    fun removeDevice(deviceId: Int): Int {
-        val result = db.removeDevice(deviceId)
-        println("Removed $result")
+    fun updateDevice(device: Device) {
+        db.updateDevice(device)
+    }
+
+    fun deleteDevice(deviceId: Int): Int {
+        val result = db.deleteDevice(deviceId)
+        println("Deleted device $result")
 
         return result
     }

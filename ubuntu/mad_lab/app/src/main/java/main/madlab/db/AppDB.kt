@@ -14,7 +14,7 @@ import main.madlab.db.data.getDefinedDevices
 import main.madlab.db.data.getDefinedRooms
 
 
-class AppDB(private val context: Context) : SQLiteOpenHelper(context, DB_NAME, null, DB_VERSION) {
+class AppDB(context: Context) : SQLiteOpenHelper(context, DB_NAME, null, DB_VERSION) {
     companion object {
         private const val DB_NAME = "MAD db"
         private const val DB_VERSION = 1
@@ -64,6 +64,7 @@ class AppDB(private val context: Context) : SQLiteOpenHelper(context, DB_NAME, n
             const val deviceName = "deviceName"
             const val roomId = "roomId"
             const val roomName = "roomName"
+            const val deviceTypeId = "deviceTypeId"
         }
     }
 
@@ -127,16 +128,6 @@ class AppDB(private val context: Context) : SQLiteOpenHelper(context, DB_NAME, n
         super.onOpen(db)
     }
 
-    fun addRoom(room: Room) {
-        val db = writableDatabase
-        val values = ContentValues()
-
-        values.put(RoomMeta.name, room.name)
-
-        db.insertOrThrow(RoomMeta.tableName, null, values)
-        db.close()
-    }
-
     fun getAllRooms(): List<Room> {
         val roomList = mutableListOf<Room>()
         val db = readableDatabase
@@ -166,9 +157,32 @@ class AppDB(private val context: Context) : SQLiteOpenHelper(context, DB_NAME, n
         return roomList
     }
 
+    fun addRoom(room: Room) {
+        val db = writableDatabase
+        val values = ContentValues()
+
+        values.put(RoomMeta.name, room.name)
+
+        db.insertOrThrow(RoomMeta.tableName, null, values)
+        db.close()
+    }
+
+    fun updateRoom(room: Room) {
+        val db = writableDatabase
+        val values = ContentValues()
+
+        values.put(RoomMeta.name, room.name)
+
+        db.update(RoomMeta.tableName, values, "${RoomMeta.id} = ?", arrayOf(room.id.toString()))
+        db.close()
+    }
+
     fun deleteRoom(roomId: Int): Int {
         val db = writableDatabase
+
+        db.execSQL("update ${DeviceMeta.tableName} set ${DeviceMeta.roomId} = null where ${DeviceMeta.roomId} = $roomId")
         val result = db.delete(RoomMeta.tableName, "${RoomMeta.id} = ?", arrayOf(roomId.toString()))
+
         db.close()
         return result
     }
@@ -219,7 +233,8 @@ class AppDB(private val context: Context) : SQLiteOpenHelper(context, DB_NAME, n
                         "${DeviceTypeMeta.imgIdFull} as ${DeviceInfoMeta.imgId}, " +
                         "${DeviceMeta.nameFull} as ${DeviceInfoMeta.deviceName}, " +
                         "${RoomMeta.idFull} as ${DeviceInfoMeta.roomId}, " +
-                        "${RoomMeta.nameFull} as ${DeviceInfoMeta.roomName} " +
+                        "${RoomMeta.nameFull} as ${DeviceInfoMeta.roomName}, " +
+                        "${DeviceMeta.typeIdFull} as ${DeviceInfoMeta.deviceTypeId} " +
                         "from ${DeviceMeta.tableName} " +
                         "inner join ${DeviceTypeMeta.tableName} on ${DeviceMeta.typeIdFull} = ${DeviceTypeMeta.idFull} " +
                         "left join room on ${DeviceMeta.roomIdFull} = ${RoomMeta.idFull} " +
@@ -237,15 +252,16 @@ class AppDB(private val context: Context) : SQLiteOpenHelper(context, DB_NAME, n
                     val imgId = it.getInt(it.getColumnIndexOrThrow(DeviceInfoMeta.imgId))
                     val deviceName = it.getString(it.getColumnIndexOrThrow(DeviceInfoMeta.deviceName))
 
-                    val roomId: Int? = try {
+                    val deviceRoomId: Int? = try {
                         it.getInt(it.getColumnIndexOrThrow(DeviceInfoMeta.roomId))
                     } catch (e: Exception) {
                         null
                     }
 
                     val roomName = it.getString(it.getColumnIndexOrThrow(DeviceInfoMeta.roomName))
+                    val deviceTypeId = it.getInt(it.getColumnIndexOrThrow(DeviceInfoMeta.deviceTypeId))
 
-                    val deviceInfo = DeviceInfo(id, imgId, deviceName, roomId, roomName)
+                    val deviceInfo = DeviceInfo(id, imgId, deviceName, deviceRoomId, roomName, deviceTypeId)
                     devicesInfo.add(deviceInfo)
                 } while (it.moveToNext())
             }
@@ -270,7 +286,19 @@ class AppDB(private val context: Context) : SQLiteOpenHelper(context, DB_NAME, n
         db.close()
     }
 
-    fun removeDevice(deviceId: Int): Int {
+    fun updateDevice(device: Device) {
+        val db = writableDatabase
+        val values = ContentValues()
+
+        values.put(DeviceMeta.roomId, device.roomId)
+        values.put(DeviceMeta.typeId, device.typeId)
+        values.put(DeviceMeta.name, device.name)
+
+        db.update(DeviceMeta.tableName, values, "${DeviceMeta.id} = ?", arrayOf(device.id.toString()))
+        db.close()
+    }
+
+    fun deleteDevice(deviceId: Int): Int {
         val db = writableDatabase
         val result = db.delete(DeviceMeta.tableName, "${DeviceMeta.id} = ?", arrayOf(deviceId.toString()))
         db.close()

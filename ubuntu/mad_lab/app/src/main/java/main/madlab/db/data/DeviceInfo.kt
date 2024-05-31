@@ -7,5 +7,6 @@ data class DeviceInfo(
     @DrawableRes var imgId: Int,
     var deviceName: String,
     var roomId: Int?,
-    var roomName: String?
+    var roomName: String?,
+    var deviceTypeId: Int
 )
