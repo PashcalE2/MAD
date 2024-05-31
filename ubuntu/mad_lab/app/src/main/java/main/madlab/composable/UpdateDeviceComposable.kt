@@ -45,10 +45,14 @@ import main.madlab.ui.theme.MADLabTheme
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun UpdateDevice(device: Device, navController: NavController?, vm: AppViewModel?) {
-    var deviceName by remember { mutableStateOf("") }
+    var deviceName by remember { mutableStateOf(device.name + "") }
 
     var deviceRoomExpanded by remember { mutableStateOf(false) }
-    val deviceRoom by remember { mutableStateOf(Room(0, "")) }
+    val deviceRoom by remember { mutableStateOf(Room(
+        if (device.roomId == null) vm!!.ALL_ROOMS_ID else device.roomId!!,
+        if (device.roomId == null) vm!!.ALL_ROOMS_NAME else vm!!.getAllRooms().stream().filter { it.id == device.roomId }.findFirst().get().name
+        )
+    ) }
 
     MADLabTheme {
         Scaffold(
@@ -172,7 +176,7 @@ fun UpdateDevice(device: Device, navController: NavController?, vm: AppViewModel
                         modifier = Modifier
                             .fillMaxWidth(0.75f)
                     ) {
-                        Text(text = "Добавить", style = MaterialTheme.typography.bodyLarge)
+                        Text(text = "Изменить", style = MaterialTheme.typography.bodyLarge)
                     }
                 }
             }

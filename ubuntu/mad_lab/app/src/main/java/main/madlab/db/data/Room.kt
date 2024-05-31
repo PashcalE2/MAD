@@ -6,8 +6,8 @@ data class Room(
 )
 
 private val definedRooms = listOf(
-    Room(0, "Гостинная"),
-    Room(1, "Кухня")
+    Room(1, "Гостинная"),
+    Room(2, "Кухня")
 )
 
 fun getDefinedRooms(): List<Room> {

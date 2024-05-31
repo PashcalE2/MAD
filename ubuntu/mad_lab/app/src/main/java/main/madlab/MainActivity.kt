@@ -44,7 +44,7 @@ fun NavigationSystem(context: Context) {
         composable("addDevice") { AddDevice(navController = navController, vm = vm) }
 
         composable(
-            "updateDevice",
+            "updateDevice/{deviceId}/{roomId}/{typeId}/{name}",
             arguments = listOf(
                 navArgument("deviceId") {
                     type = NavType.IntType
@@ -76,7 +76,7 @@ fun NavigationSystem(context: Context) {
         composable("addRoom") { AddRoom(navController = navController, vm = vm) }
 
         composable(
-            "updateRoom",
+            "updateRoom/{roomId}/{name}",
             arguments = listOf(
                 navArgument("roomId") {
                     type = NavType.IntType

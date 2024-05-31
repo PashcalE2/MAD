@@ -8,9 +8,9 @@ data class Device(
 )
 
 private val definedDevices = listOf(
-    Device(0, null, 0, "Жаробор"),
-    Device(1, 0, 3, "Лупа"),
-    Device(2, 1, 3, "Пупа")
+    Device(1, null, 1, "Жаробор"),
+    Device(2, 1, 4, "Лупа"),
+    Device(3, 2, 4, "Пупа")
 )
 
 fun getDefinedDevices(): List<Device> {

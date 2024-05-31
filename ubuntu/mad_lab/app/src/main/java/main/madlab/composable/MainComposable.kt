@@ -100,11 +100,7 @@ fun DeviceListItem(navController: NavController?, vm: AppViewModel?, deviceInfo:
                         onClick = {
                             println("Настроить " + deviceInfo.deviceId)
 
-                            navController!!.currentBackStackEntry!!.arguments!!.putInt("deviceId", deviceInfo.deviceId)
-                            navController.currentBackStackEntry!!.arguments!!.putInt("roomId", if (deviceInfo.roomId == null) vm!!.ALL_ROOMS_ID else deviceInfo.roomId!!)
-                            navController.currentBackStackEntry!!.arguments!!.putInt("typeId", deviceInfo.deviceTypeId)
-                            navController.currentBackStackEntry!!.arguments!!.putString("name", deviceInfo.deviceName)
-                            navController.navigate("updateDevice")
+                            navController?.navigate("updateDevice/${deviceInfo.deviceId}/${deviceInfo.roomId}/${deviceInfo.deviceTypeId}/${deviceInfo.deviceName}")
 
                             showMenu = false
                         }
@@ -204,7 +200,7 @@ fun RoomSelectionButton(room: Room, onClickWhenNotSelected: (Room) -> Unit, onCl
 fun Main(navController: NavController?, vm: AppViewModel?) {
     var showRoomMenu by remember { mutableStateOf(false) }
     var updateTrigger by remember { mutableStateOf(false) }
-    var selectedRoom by remember { mutableStateOf(Room(vm!!.ALL_ROOMS_ID, vm.ALL_ROOMS_NAME)) }
+    val selectedRoom by remember { mutableStateOf(Room(vm!!.ALL_ROOMS_ID, vm.ALL_ROOMS_NAME)) }
     var deleteRoomEnabled by remember { mutableStateOf(false) }
 
     val devicesInfo: List<DeviceInfo> = vm!!.getAllDevicesInfo(selectedRoom.id)
@@ -238,6 +234,7 @@ fun Main(navController: NavController?, vm: AppViewModel?) {
                                     room = Room(vm.ALL_ROOMS_ID, vm.ALL_ROOMS_NAME),
                                     onClickWhenNotSelected = {
                                         selectedRoom.id = it.id
+                                        selectedRoom.name = it.name
                                         deleteRoomEnabled = false
 
                                         updateTrigger = !updateTrigger
@@ -259,9 +256,7 @@ fun Main(navController: NavController?, vm: AppViewModel?) {
                                         updateTrigger = !updateTrigger
                                     },
                                     onClickWhenSelected = {
-                                        navController!!.currentBackStackEntry!!.arguments!!.putInt("roomId", selectedRoom.id)
-                                        navController.currentBackStackEntry!!.arguments!!.putString("name", selectedRoom.name)
-                                        navController.navigate("updateRoom")
+                                        navController?.navigate("updateRoom/${selectedRoom.id}/${selectedRoom.name}")
                                     },
                                     selectedRoomId = selectedRoom.id
                                 )

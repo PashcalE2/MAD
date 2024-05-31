@@ -43,7 +43,7 @@ import main.madlab.ui.theme.MADLabTheme
 
 @Composable
 fun UpdateRoom(room: Room, navController: NavController?, vm: AppViewModel?) {
-    var roomName by remember { mutableStateOf("") }
+    var roomName by remember { mutableStateOf(room.name + "") }
 
     MADLabTheme {
         Scaffold(
@@ -76,7 +76,7 @@ fun UpdateRoom(room: Room, navController: NavController?, vm: AppViewModel?) {
                     .padding(Dp(40f))
             ) {
 
-                // input device name
+                // input room name
                 TextField(
                     value = roomName,
                     onValueChange = {
@@ -105,7 +105,7 @@ fun UpdateRoom(room: Room, navController: NavController?, vm: AppViewModel?) {
                         modifier = Modifier
                             .fillMaxWidth(0.75f)
                     ) {
-                        Text(text = "Добавить", style = MaterialTheme.typography.bodyLarge)
+                        Text(text = "Изменить", style = MaterialTheme.typography.bodyLarge)
                     }
                 }
             }

@@ -11,7 +11,7 @@ import main.madlab.db.data.Room
 class AppViewModel(context: Context): ViewModel() {
     private val db: AppDB = AppDB(context = context)
 
-    val ALL_ROOMS_ID = -1
+    val ALL_ROOMS_ID = 0
     val ALL_ROOMS_NAME = "Весь дом"
 
     fun getAllRooms(): List<Room> {

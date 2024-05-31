@@ -10,11 +10,11 @@ data class DeviceType(
 )
 
 private val definedDeviceTypes = listOf(
-    DeviceType(0, "Кондиционер", R.drawable.conditioner),
-    DeviceType(1, "Лампа", R.drawable.lamp),
-    DeviceType(2, "Светодиодная лента", R.drawable.mini_light),
-    DeviceType(3, "Умная колонка", R.drawable.umnaya_kolonka),
-    DeviceType(4, "Робот пылесос", R.drawable.vacuum_cleaner)
+    DeviceType(1, "Кондиционер", R.drawable.conditioner),
+    DeviceType(2, "Лампа", R.drawable.lamp),
+    DeviceType(3, "Светодиодная лента", R.drawable.mini_light),
+    DeviceType(4, "Умная колонка", R.drawable.umnaya_kolonka),
+    DeviceType(5, "Робот пылесос", R.drawable.vacuum_cleaner)
 )
 
 fun getDefinedDeviceTypes(): List<DeviceType> {

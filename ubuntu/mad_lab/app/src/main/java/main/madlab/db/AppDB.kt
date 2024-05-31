@@ -17,7 +17,7 @@ import main.madlab.db.data.getDefinedRooms
 class AppDB(context: Context) : SQLiteOpenHelper(context, DB_NAME, null, DB_VERSION) {
     companion object {
         private const val DB_NAME = "MAD db"
-        private const val DB_VERSION = 1
+        private const val DB_VERSION = 4
 
         private object RoomMeta {
             const val tableName = "room"
