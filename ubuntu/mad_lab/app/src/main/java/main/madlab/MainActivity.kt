@@ -30,14 +30,6 @@ class MainActivity : ComponentActivity() {
     }
 }
 
-fun updateDeviceRoute(device: Device): String {
-    return "updateDevice/{${device.id}}/{${device.roomId}}/{${device.typeId}}/{${device.name}}"
-}
-
-fun updateRoomRoute(room: Room): String {
-    return "updateRoom/{${room.id}}/{${room.name}}"
-}
-
 @Composable
 fun NavigationSystem(context: Context) {
     val navController = rememberNavController()
@@ -52,7 +44,7 @@ fun NavigationSystem(context: Context) {
         composable("addDevice") { AddDevice(navController = navController, vm = vm) }
 
         composable(
-            "updateDevice/{deviceId}/{roomId}/{typeId}/{name}",
+            "updateDevice",
             arguments = listOf(
                 navArgument("deviceId") {
                     type = NavType.IntType
@@ -68,10 +60,11 @@ fun NavigationSystem(context: Context) {
                 }
             )
         ) {
+            val roomId = it.arguments?.getInt("roomId")!!
             UpdateDevice(
                 device = Device(
                     it.arguments?.getInt("deviceId")!!,
-                    it.arguments?.getInt("roomId")!!,
+                    if (roomId == vm.ALL_ROOMS_ID) null else roomId,
                     it.arguments?.getInt("typeId")!!,
                     it.arguments?.getString("name")!!
                 ),
@@ -83,7 +76,7 @@ fun NavigationSystem(context: Context) {
         composable("addRoom") { AddRoom(navController = navController, vm = vm) }
 
         composable(
-            "updateRoom/{roomId}/{name}",
+            "updateRoom",
             arguments = listOf(
                 navArgument("roomId") {
                     type = NavType.IntType
