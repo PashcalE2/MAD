@@ -38,7 +38,6 @@ import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import main.madlab.AppViewModel
 import main.madlab.db.data.Device
-import main.madlab.db.data.DeviceType
 import main.madlab.db.data.Room
 import main.madlab.ui.theme.MADLabTheme
 

@@ -31,7 +31,7 @@ class MainActivity : ComponentActivity() {
 }
 
 @Composable
-fun NavigationSystem(context: Context) {
+private fun NavigationSystem(context: Context) {
     val navController = rememberNavController()
     val vm = AppViewModel(context)
 

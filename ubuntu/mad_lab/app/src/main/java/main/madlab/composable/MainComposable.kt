@@ -35,7 +35,6 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.key
-import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
@@ -131,31 +130,6 @@ fun DeviceListItem(navController: NavController?, vm: AppViewModel?, deviceInfo:
                     text = String.format("%s", if (deviceInfo.roomName == null) vm!!.ALL_ROOMS_NAME else deviceInfo.roomName)
                 )
             }
-
-            /*
-            Box (
-                modifier = Modifier
-                    .fillMaxSize(),
-                contentAlignment = Alignment.BottomEnd
-            ) {
-                Button(
-                    onClick = {
-                        println(deviceInfo.deviceId)
-                    },
-                    colors = ButtonDefaults.buttonColors(
-                        MaterialTheme.colorScheme.primaryContainer,
-                        Color.Black,
-                        MaterialTheme.colorScheme.primaryContainer,
-                        Color.Gray
-                    )
-                ) {
-                    Icon(
-                        painter = painterResource(id = R.drawable.baseline_power_settings_new_24),
-                        contentDescription = null
-                    )
-                }
-            }
-            */
         }
     }
 }
