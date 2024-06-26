@@ -1,16 +1,36 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <style name="Device" parent="@style/TextAppearance.AppCompat">
+    <style name="AnyText" parent="@style/TextAppearance.AppCompat">
         <item name="fontFamily">sans-serif-medium</item>
     </style>
 
-    <style name="Device.Header">
-        <item name="android:textSize">34sp</item>
+    <style name="Room.Name" parent="AnyText">
+        <item name="android:textSize">18sp</item>
         <item name="android:textColor">@color/black</item>
     </style>
 
-    <style name="Device.Description">
-        <item name="android:textSize">24sp</item>
+    <style name="DeviceText" parent="AnyText" />
+
+    <style name="DeviceText.Header">
+        <item name="android:textSize">18sp</item>
+        <item name="android:textColor">@color/black</item>
+    </style>
+
+    <style name="DeviceText.Description">
+        <item name="android:textSize">14sp</item>
         <item name="android:textColor">@color/dark_grey</item>
     </style>
+
+
+    <style name="DeviceImg">
+        <item name="android:layout_width">150dp</item>
+        <item name="android:layout_height">100dp</item>
+    </style>
+
+    <style name="DeviceButton">
+        <item name="android:layout_width">50dp</item>
+        <item name="android:layout_height">50dp</item>
+    </style>
+
+
 </resources>

@@ -1,44 +1,100 @@
 package main.madlab
 
+import android.content.Context
 import android.os.Bundle
-import android.view.LayoutInflater
-import android.view.View
-import android.view.ViewGroup
-import android.widget.Button
-import android.widget.FrameLayout
-import android.widget.LinearLayout
-import android.widget.TextView
+import androidx.activity.ComponentActivity
+import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
-import androidx.appcompat.app.AppCompatActivity
-import androidx.core.view.ViewCompat
-import androidx.core.view.WindowInsetsCompat
+import androidx.compose.runtime.Composable
+import androidx.compose.ui.platform.LocalContext
+import androidx.navigation.NavType
+import androidx.navigation.compose.NavHost
+import androidx.navigation.compose.composable
+import androidx.navigation.compose.rememberNavController
+import androidx.navigation.navArgument
+import main.madlab.composable.AddDevice
+import main.madlab.composable.AddRoom
+import main.madlab.composable.Main
+import main.madlab.composable.UpdateDevice
+import main.madlab.composable.UpdateRoom
+import main.madlab.db.data.Device
+import main.madlab.db.data.Room
 
-class MainActivity : AppCompatActivity() {
-    private lateinit var button: Button
-    private lateinit var devicesLayout: LinearLayout
-    private var devicesList = mutableListOf<View>()
-
+class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
-        setContentView(R.layout.main)
-        ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main)) { v, insets ->
-            val systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
-            v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom)
-            insets
-        }
-
-        devicesLayout = findViewById(R.id.devices_layout)
-
-        button = findViewById(R.id.add_button)
-        button.setOnClickListener { _ ->
-            val newDeviceLayout: ViewGroup = FrameLayout(devicesLayout.context)
-            val newDevice: View = LayoutInflater.from(newDeviceLayout.context).inflate(R.layout.device, newDeviceLayout, true)
-
-            devicesList.add(newDeviceLayout)
-            devicesLayout.addView(newDeviceLayout)
-
-            println(devicesLayout.childCount)
+        setContent {
+            NavigationSystem(LocalContext.current)
         }
     }
 }
+
+@Composable
+private fun NavigationSystem(context: Context) {
+    val navController = rememberNavController()
+    val vm = AppViewModel(context)
+
+    NavHost(
+        navController = navController,
+        startDestination = "home"
+    ) {
+        composable("home") { Main(navController = navController, vm = vm) }
+
+        composable("addDevice") { AddDevice(navController = navController, vm = vm) }
+
+        composable(
+            "updateDevice/{deviceId}/{roomId}/{typeId}/{name}",
+            arguments = listOf(
+                navArgument("deviceId") {
+                    type = NavType.IntType
+                },
+                navArgument("roomId") {
+                    type = NavType.IntType
+                },
+                navArgument("typeId") {
+                    type = NavType.IntType
+                },
+                navArgument("name") {
+                    type = NavType.StringType
+                }
+            )
+        ) {
+            val roomId = it.arguments?.getInt("roomId")!!
+            UpdateDevice(
+                device = Device(
+                    it.arguments?.getInt("deviceId")!!,
+                    if (roomId == vm.ALL_ROOMS_ID) null else roomId,
+                    it.arguments?.getInt("typeId")!!,
+                    it.arguments?.getString("name")!!
+                ),
+                navController = navController,
+                vm = vm
+            )
+        }
+
+        composable("addRoom") { AddRoom(navController = navController, vm = vm) }
+
+        composable(
+            "updateRoom/{roomId}/{name}",
+            arguments = listOf(
+                navArgument("roomId") {
+                    type = NavType.IntType
+                },
+                navArgument("name") {
+                    type = NavType.StringType
+                }
+            )
+        ) {
+            UpdateRoom(
+                room = Room(
+                    it.arguments?.getInt("roomId")!!,
+                    it.arguments?.getString("name")!!
+                ),
+                navController = navController,
+                vm = vm
+            )
+        }
+    }
+}
+

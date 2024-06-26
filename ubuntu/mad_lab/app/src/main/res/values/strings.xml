@@ -1,5 +1,13 @@
 <resources>
-    <string name="app_name">MAD lab</string>
-    <string name="title_activity_test">TestActivity</string>
-    <string name="devices">Подключенные устройства</string>
+    <string name="DevicesLayout.Description">Подключенные устройства</string>
+
+    <string name="Device.Type.Conditioner.Name">Кондиционер</string>
+    <string name="Device.Type.Lamp.Name">Лампа</string>
+    <string name="Device.Type.MiniLamp.Name">Светодиодная лента</string>
+    <string name="Device.Type.VacuumCleaner.Name">Робот пылесос</string>
+    <string name="Device.Type.SmartSpeaker.Name">Умная колонка</string>
+
+    <string name="Device.Button.Description">вкл ИЛИ выкл</string>
+    <string name="title_activity_add_device">AddDeviceActivity</string>
+    <string name="title_activity_main">MainActivity</string>
 </resources>
